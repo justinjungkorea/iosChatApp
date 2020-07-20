@@ -31,27 +31,49 @@ struct ContentView: View {
         
         static let shared = SocketConnect()
         
-        var manager = SocketManager(socketURL: URL(string: "http://192.168.35.94:7605")!, config: [.log(true), .reconnects(true), .forceWebsockets(true), .secure(true)] )
-        
-        var socket: SocketIOClient!
+        var manager: SocketManager?
         
         override init() {
             super.init()
+            
+            self.manager = SocketManager(socketURL: URL(string: "https://knowledgetalk.co.kr:7101")!, config: [.log(true), .reconnects(true), .forceWebsockets(true)] )
+            
         }
         
         func establishConnection() {
-            manager.defaultSocket.on(clientEvent: .connect){data, ack in
-                print(data);
+            var socket: SocketIOClient!
+            socket = self.manager?.defaultSocket
+            socket = self.manager?.socket(forNamespace: "/SignalServer")
+            
+            socket.on("knowledgetalk"){data, ack in
+                print(data)
             }
-            socket = self.manager.socket(forNamespace: "/SignalServer")
-
-            socket.connect()
+            
+            socket.on(clientEvent: .connect){data, ack in
+                print("socket connected!")
+            }
+            
+            socket.on(clientEvent: .error){data, ack in
+                print("socket error")
+            }
+            
+            socket.on(clientEvent: .disconnect){data, ack in
+                print("socket disconnect")
+            }
+            
+            socket.on(clientEvent: .reconnect){data, ack in
+                print("socket reconnect")
+            }
+            
+            socket.connect(timeoutAfter: 15){
+                print("can't connect to socket")
+            }
+                       
         }
         
-        func closeConnection() {
-            socket.disconnect()
+        func addHandlers(){
+            
         }
-        
         
         
         func sendMessage(){
@@ -72,7 +94,7 @@ struct ContentView: View {
                 
             }
             
-            socket.emit("knowledgetalk", sample as! SocketData)
+//            socket.emit("knowledgetalk", ["messge": "test"])
         }
     }
     
