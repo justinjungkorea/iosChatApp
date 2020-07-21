@@ -11,20 +11,35 @@ import SocketIO
 
 struct ContentView: View {
     let socket = SocketConnect();
+    @State var roomId: String = ""
+    
     var body: some View {
-        VStack(spacing: 50) {
-            Button(action:{
-                self.socket.establishConnection()
-            }){
-                Text("Connection")
-            }
-            
-            Button(action: {
-                self.socket.sendMessage()
-            }){
-                Text("Send")
+        VStack {
+            TextField("input a roomId", text: $roomId )
+            VStack(spacing: 30) {
+                
+                HStack(alignment: .top, spacing: 50) {
+                    Button(action:{
+                        self.socket.establishConnection()
+                    }){
+                        Text("Connection")
+                    }
+                    
+                    Button(action: {
+                        self.socket.Register()
+                    }){
+                        Text("Register")
+                    }
+                    
+                    Button(action: {
+                        self.socket.roomJoin()
+                    }){
+                        Text("RoomJoin")
+                    }
+                }
             }
         }
+        
     }
     
     class SocketConnect: NSObject{
@@ -37,7 +52,7 @@ struct ContentView: View {
         override init() {
             super.init()
             
-            self.manager = SocketManager(socketURL: URL(string: "http://106.240.247.44:7605")!, config: [.log(true), .reconnects(true), .forceWebsockets(true)] )
+            self.manager = SocketManager(socketURL: URL(string: "http://106.240.247.44:7605")!, config: [.log(false), .forcePolling(true)] )
             
         }
         
@@ -47,7 +62,8 @@ struct ContentView: View {
             socket = self.manager?.socket(forNamespace: "/SignalServer")
             
             socket.on("knowledgetalk"){data, ack in
-                print(data)
+                print("receive ::: \(data)")
+                
             }
             
             socket.on(clientEvent: .connect){data, ack in
@@ -69,32 +85,31 @@ struct ContentView: View {
             socket.connect()
                        
         }
-        
-        func addHandlers(){
-            
-        }
-        
-        
-        func sendMessage(){
+
+        func Register(){
             
             let sample: [String: Any] = [
                 "eventOp": "Register",
-                "reqNo": "12213123",
-                "reqDate": "20200720213012"
+                "reqNo": getReqNo(),
+                "reqDate": getDate()
             ]
             
-            do {
-                let jsonData = try JSONSerialization.data(withJSONObject: sample, options: [])
-                let jsonString = String(data: jsonData, encoding: String.Encoding.utf8)!
-                
-                socket.emit("knowledgetalk", jsonString)
-                
-            } catch {
-                
-            }
+            let sendData = arrayToJSON(inputData: sample)
+            socket.emit("knowledgetalk", sendData as! SocketData)
             
+        }
+        
+        func roomJoin(){
             
+            let sample: [String: Any] = [
+                "eventOp": "RoomJoin",
+                "reqNo": getReqNo(),
+                "reqDate": getDate(),
+                "roomId": ContentView().roomId
+            ]
             
+            let sendData = arrayToJSON(inputData: sample)
+            socket.emit("knowledgetalk", sendData as! SocketData)
         }
     }
     
@@ -106,3 +121,36 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
+func arrayToJSON(inputData: [String: Any]) -> Any {
+    do {
+        let jsonData = try JSONSerialization.data(withJSONObject: inputData, options: [])
+        let jsonString = String(data: jsonData, encoding: String.Encoding.utf8)!
+        let temp = jsonString.data(using: .utf8)!
+        let jsonObject = try JSONSerialization.jsonObject(with: temp, options: .allowFragments)
+        
+        return jsonObject
+        
+    } catch {
+        return 0
+    }
+}
+
+func getReqNo() -> String {
+    var reqNo = ""
+    
+    for _ in 0..<7 {
+        reqNo = reqNo + String(Int.random(in: 0...9))
+    }
+    
+    return reqNo
+}
+
+func getDate() -> String {
+    let today = Date()
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "ko_KR")
+    formatter.dateFormat = "yyyyMMddHHmmss"
+    let dateString = formatter.string(from: today)
+
+    return dateString
+}
