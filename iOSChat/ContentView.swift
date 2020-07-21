@@ -32,16 +32,17 @@ struct ContentView: View {
         static let shared = SocketConnect()
         
         var manager: SocketManager?
+        var socket: SocketIOClient!
         
         override init() {
             super.init()
             
-            self.manager = SocketManager(socketURL: URL(string: "https://knowledgetalk.co.kr:7101")!, config: [.log(true), .reconnects(true), .forceWebsockets(true)] )
+            self.manager = SocketManager(socketURL: URL(string: "http://106.240.247.44:7605")!, config: [.log(true), .reconnects(true), .forceWebsockets(true)] )
             
         }
         
         func establishConnection() {
-            var socket: SocketIOClient!
+            
             socket = self.manager?.defaultSocket
             socket = self.manager?.socket(forNamespace: "/SignalServer")
             
@@ -65,9 +66,7 @@ struct ContentView: View {
                 print("socket reconnect")
             }
             
-            socket.connect(timeoutAfter: 15){
-                print("can't connect to socket")
-            }
+            socket.connect()
                        
         }
         
@@ -78,23 +77,24 @@ struct ContentView: View {
         
         func sendMessage(){
             
-            struct RegisterData: Codable {
-                let eventOp: String
-                let reqNo: String
-                let reqDate: String
-            }
+            let sample: [String: Any] = [
+                "eventOp": "Register",
+                "reqNo": "12213123",
+                "reqDate": "20200720213012"
+            ]
             
-            let sample = RegisterData(eventOp: "Register", reqNo: "12213123", reqDate: "20200720213012")
-           
             do {
-                let jsonEncoder = JSONEncoder()
-                let jsonData = try jsonEncoder.encode(sample)
+                let jsonData = try JSONSerialization.data(withJSONObject: sample, options: [])
+                let jsonString = String(data: jsonData, encoding: String.Encoding.utf8)!
+                
+                socket.emit("knowledgetalk", jsonString)
                 
             } catch {
                 
             }
             
-//            socket.emit("knowledgetalk", ["messge": "test"])
+            
+            
         }
     }
     
