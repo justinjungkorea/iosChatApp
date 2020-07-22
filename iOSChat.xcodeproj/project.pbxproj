@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,6 +14,7 @@
 		E733F80D24C5BD61007FED96 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E733F80C24C5BD61007FED96 /* Assets.xcassets */; };
 		E733F81024C5BD61007FED96 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E733F80F24C5BD61007FED96 /* Preview Assets.xcassets */; };
 		E733F81324C5BD61007FED96 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E733F81124C5BD61007FED96 /* LaunchScreen.storyboard */; };
+		E75F239524C887280092BD8B /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = E75F239424C887280092BD8B /* SwiftyJSON */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E75F239524C887280092BD8B /* SwiftyJSON in Frameworks */,
 				BFD4C1C0C73E7DC446AA9C97 /* Pods_iOSChat.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -119,6 +121,9 @@
 			dependencies = (
 			);
 			name = iOSChat;
+			packageProductDependencies = (
+				E75F239424C887280092BD8B /* SwiftyJSON */,
+			);
 			productName = iOSChat;
 			productReference = E733F80324C5BD60007FED96 /* iOSChat.app */;
 			productType = "com.apple.product-type.application";
@@ -147,6 +152,9 @@
 				Base,
 			);
 			mainGroup = E733F7FA24C5BD60007FED96;
+			packageReferences = (
+				E75F239324C887280092BD8B /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
+			);
 			productRefGroup = E733F80424C5BD60007FED96 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -418,6 +426,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E75F239324C887280092BD8B /* XCRemoteSwiftPackageReference "SwiftyJSON" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyJSON/SwiftyJSON.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E75F239424C887280092BD8B /* SwiftyJSON */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E75F239324C887280092BD8B /* XCRemoteSwiftPackageReference "SwiftyJSON" */;
+			productName = SwiftyJSON;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E733F7FB24C5BD60007FED96 /* Project object */;
 }

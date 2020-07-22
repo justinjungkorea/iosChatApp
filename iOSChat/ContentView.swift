@@ -8,6 +8,7 @@
 
 import SwiftUI
 import SocketIO
+import SwiftyJSON
 
 struct ContentView: View {
     let socket = SocketConnect();
@@ -62,8 +63,10 @@ struct ContentView: View {
             socket = self.manager?.socket(forNamespace: "/SignalServer")
             
             socket.on("knowledgetalk"){data, ack in
-                print("receive ::: \(data)")
+                let temp = getValue(inputData: data, key: "eventOpy")
+                print("receive ::: \(temp)")
                 
+
             }
             
             socket.on(clientEvent: .connect){data, ack in
@@ -133,6 +136,17 @@ func arrayToJSON(inputData: [String: Any]) -> Any {
     } catch {
         return 0
     }
+}
+
+func getValue(inputData: Any, key: String) -> Any? {
+    let jsonData = JSON(inputData)
+    let result = jsonData[0][key].stringValue
+    if(result.isEmpty){
+        return nil
+    } else {
+        return result
+    }
+   
 }
 
 func getReqNo() -> String {
